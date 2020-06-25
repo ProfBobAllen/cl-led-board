@@ -65,7 +65,7 @@ def bouncy(strip):
     col = 0
     deltaH = 2
     deltaV = -1
-    for i in range (500):  #  just how long to bounce the ball
+    for i in range (200):  #  just how long to bounce the ball
         setColorAt(strip,Color(128,128,0),row,col)
         row += deltaV
         if row < 0:
@@ -121,13 +121,13 @@ def wheel(pos):
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
 
-def rainbow(strip, wait_ms=2, iterations=1):
+def rainbow(strip, wait_ms=1, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
     for j in range(256*iterations):
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, wheel((i+j) & 255))
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms/9000.0)
 
 def rainbowCycle(strip, wait_ms=2, iterations=5):
     """Draw rainbow that uniformly distributes itself across all pixels."""
