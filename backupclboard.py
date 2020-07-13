@@ -5,10 +5,7 @@
 # Direct port of the Arduino NeoPixel library strandtest example.  Showcases
 # various animations on a strip of NeoPixels.
 
-from alphabet import *
-
 import time
-import random
 from rpi_ws281x import *
 import argparse
 
@@ -18,113 +15,17 @@ LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS = 128     # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
-
-colorWhite = Color(255,255,255)
-colorBlack = Color(0,0,0)
-
-# CL centered 
-def cl(strip):
-    clrow = [4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,8,8,8,8,8,9,9,9,9,9,9,10,10,10,10,10,11,11,11,11,11,12,12,12,12,12,12,13,13,13,13,13,14,14,14,14,14,14,14,14,15,15,15,15,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17]
-    clcol = [13,14,15,16,17,18,25,26,27,28,29,30,12,13,14,15,16,17,18,19,27,28,12,13,14,15,16,17,18,19,20,27,28,11,12,13,14,19,20,27,28,11,12,13,27,28,10,11,12,13,27,28,10,11,12,27,28,10,11,12,27,28,10,11,12,13,27,28,11,12,13,27,28,11,12,13,14,19,20,27,28,11,12,13,14,15,16,17,18,19,20,27,28,33,34,12,13,14,15,16,17,18,19,27,28,29,30,31,32,33,34,13,14,15,16,17,18,25,26,27,28,29,30,31,32,33,34]
-    fillBoard(strip,colorBlack)
-    for i in range(len(clrow)):
-        setColorAt(strip,colorWhite,clcol[i],clrow[i])
-    strip.show()
-
-# Scroll Message on given row 
-def scrollMessage(strip,message,row):
-    for i in range(51 + len(message)*6):  # enough to get all chars across screen
-        putStringAt(strip,message,45-i,row-6)
-        time.sleep(.05)
-        
-
-
-# Put STRING at loops through the chars and calls putCharAt
-def putStringAt(strip,theString,theX,theY):
-    for i in range(len(theString)):
-        putCharAt(strip,theString[i],theX,theY)
-        theX += 6
-    strip.show()
-
-#  Put character at uses a, b, c, defined in alphabet.py
-def putCharAt(strip,theChar,theX,theY):
-    fgColor = Color(128,128,0)
-    bgColor = colorBlack
-    letters = "abcdefghijklmnopqrstuvwxyz "
-    mystring = []
-    letterIndex = letters.index(theChar)
-    pattern = alphabet[letterIndex]
-    for x in range(6):
-        for y in range(7):
-            if pattern[y][x] == 1:
-                setColorAt(strip,fgColor,x+theX,y+theY)
-            else:
-                setColorAt(strip,bgColor,x+theX,y+theY)
-    #strip.show()
-
-# Marquee Border
-def marqueeBorder(strip):
-    for cycle in range(50):
-        for col in range(22):
-            setColorAt(strip,colorWhite,col*2,0)
-            setColorAt(strip,colorBlack,col*2+1,0)
-            setColorAt(strip,colorWhite,col*2+1,21)
-            setColorAt(strip,colorBlack,col*2,21)
-        for row in range(11):
-            setColorAt(strip,colorWhite,0,row*2)
-            setColorAt(strip,colorBlack,0,row*2+1)
-            setColorAt(strip,colorWhite,44,row*2)
-            setColorAt(strip,colorBlack,44,row*2+1)
-        strip.show()
-        time.sleep(.1)
-        for col in range(22):
-            setColorAt(strip,colorBlack,col*2,0)
-            setColorAt(strip,colorWhite,col*2+1,0)
-            setColorAt(strip,colorBlack,col*2+1,21)
-            setColorAt(strip,colorWhite,col*2,21)
-        for row in range(11):
-            setColorAt(strip,colorBlack,0,row*2)
-            setColorAt(strip,colorWhite,0,row*2+1)
-            setColorAt(strip,colorBlack,44,row*2)
-            setColorAt(strip,colorWhite,44,row*2+1)
-        strip.show()
-        time.sleep(.1)
-        
 
 # Make a centered rectangle filled with color
 #   upper left corner (x,y), width and height of rec
 def makeRec(strip,color,x,y,w,h):
     for row in range(h):
         for col in range(w):
-            setColorAt(strip,color,col+y,row+x)
-    #strip.show()
-
-# Random Sparkle Fill
-def randomSparkle(strip):
-    fillBoard(strip,Color(155,155,155))
-    for i in range (3000):  # How many random pixels to turn on
-        strip.setPixelColor(random.randint(0,990), Color(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
-        if i%5 == 0:
-            strip.show()
-
-# Cascading Rectangles
-def cascadeRecs(strip):
-    fillBoard(strip,Color(0,0,0))
-    mycolors = []
-    for i in range (11):
-        mycolors.append(Color(random.randint(0,128),random.randint(0,128),random.randint(0,128)))
-
-    # How many times to cascade the recs
-    for x in range(100):
-        for i in range (11):
-            makeRec(strip,mycolors[i],i,i,45-i*2,22-i*2)
-        strip.show()
-        time.sleep(0.1)
-        mycolors.append(mycolors.pop(0))
-        
+            setColorAt(strip,color,row+x,col+y)
+    strip.show();
 
 # Strips for flag
 def makeFlag(strip):
@@ -134,44 +35,43 @@ def makeFlag(strip):
     # Place white stripes 
     for i in [2,5,8,11,14,17,20]:
         for j in range(45):
-            setColorAt(strip,Color(255,255,255),j,i)
+            setColorAt(strip,Color(255,255,255),i,j)
 
     # Fill in blue corner
     for row in range(11):
         for col in range(23):
-            setColorAt(strip, Color(0,0,255),col,row)
+            setColorAt(strip, Color(0,0,255),row,col)
 
     # Add stars
     for row in [1,3,5,7,9]:
         for col in [1,5,9,13,17,21]:
-            setColorAt(strip, Color(255,255,255),col,row)
+            setColorAt(strip, Color(255,255,255),row,col)
 
     for row in [2,4,6,8]:
         for col in [3,7,11,15,19]:
-            setColorAt(strip, Color(255,255,255),col,row)
+            setColorAt(strip, Color(255,255,255),row,col)
 
     # Turn off bottom two rows
     for row in [20,21]:
         for col in range(45):
-            setColorAt(strip, Color(0,0,0), col, row)
+            setColorAt(strip, Color(0,0,0), row, col)
 
     strip.show()
 
 
-# Define function to map (x,y) to a pixel and give it a color
-def setColorAt(strip, color, x, y):
-    if x >= 0 and x <45 and y >= 0 and y < 22:
-        if y%2 != 0:
-            offset = x - 44
-        else:
-            offset = -x
-        strip.setPixelColor(989-(y*45)+offset,color)
+# Define function to map row/col to a pixel and give it a color
+def setColorAt(strip, color, row, col):
+    if row%2 != 0:
+        offset = col - 44
+    else:
+        offset = -col
+    strip.setPixelColor(989-(row*45)+offset,color)
 
 # Draw both diagonals with given color
 def drawDiagonals(strip, color):
     for i in range(22):
-        setColorAt(strip,color,i*2,i)
-        setColorAt(strip,color,i*2,21-i)
+        setColorAt(strip,color,i,i*2)
+        setColorAt(strip,color,21-i,i*2)
         strip.show()
 
 # Fill board with color
@@ -184,7 +84,7 @@ def fillBoard(strip,color):
 def wipeLR(strip,color):
     for col in range(45):
         for row in range(22):
-            setColorAt(strip,color,col,row)
+            setColorAt(strip,color,row,col)
         strip.show()
         time.sleep(0.05)
         
@@ -193,7 +93,7 @@ def wipeLR(strip,color):
 def wipeTB(strip,color):
     for row in range(22):
         for col in range(45):
-            setColorAt(strip,color,col,row)
+            setColorAt(strip,color,row,col)
         strip.show()
         time.sleep(0.05)
         
@@ -205,7 +105,7 @@ def bouncy(strip):
     deltaH = 2
     deltaV = -1
     for i in range (200):  #  just how long to bounce the ball
-        setColorAt(strip,Color(128,128,0),col,row)
+        setColorAt(strip,Color(128,128,0),row,col)
         row += deltaV
         if row < 0:
             row = 0
@@ -220,7 +120,7 @@ def bouncy(strip):
         if col >= 45:
             col = 44
             deltaH = -1
-        setColorAt(strip,Color(0,0,0),col,row)
+        setColorAt(strip,Color(0,0,0),row,col)
         strip.show()
         time.sleep(0.025)
 
@@ -260,7 +160,7 @@ def wheel(pos):
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
 
-def rainbow(strip, wait_ms=.5, iterations=1):
+def rainbow(strip, wait_ms=1, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
     for j in range(256*iterations):
         for i in range(strip.numPixels()):
@@ -307,18 +207,10 @@ if __name__ == '__main__':
 
         while True:
             print ('Testing Code....')
-            wipeLR(strip,Color(50,50,50))
-            scrollMessage(strip,"welcome to the creativity lab",10)
-            randomSparkle(strip)
-            wipeLR(strip,Color(0,0,255))
-            cl(strip)
-            marqueeBorder(strip)
-            #break
-
             makeFlag(strip)
-            time.sleep(7)
-            cascadeRecs(strip)
-            time.sleep(1)
+            time.sleep(5)
+            makeRec(strip,Color(128,128,0),9,20,5,4)
+            time.sleep(5)
             fillBoard(strip,Color(255,0,255))
             wipeLR(strip,Color(0,0,255))
             drawDiagonals(strip,Color(0,0,0))
